@@ -4,6 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'DIRECTOR' | 'ASSISTANT' | 'ADMIN';
+  isActive?: boolean;
 }
 
 export interface Participant {
