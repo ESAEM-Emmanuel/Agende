@@ -54,26 +54,26 @@ export function UserModal({ user, onClose, onSave }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl w-full max-w-md shadow-2xl"
+        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-800">
+        <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-white z-10">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800">
             {user ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl w-10 h-10 flex items-center justify-center">&times;</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Prénom *</label>
               <input
                 value={form.firstName}
                 onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm"
                 required
               />
             </div>
@@ -82,7 +82,7 @@ export function UserModal({ user, onClose, onSave }: Props) {
               <input
                 value={form.lastName}
                 onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm"
                 required
               />
             </div>
@@ -127,17 +127,17 @@ export function UserModal({ user, onClose, onSave }: Props) {
             </select>
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium"
+              className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium min-h-[44px]"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800"
+              className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 min-h-[44px]"
             >
               {user ? 'Enregistrer' : 'Créer'}
             </button>

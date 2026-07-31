@@ -327,20 +327,20 @@ export function AppointmentDetail({ appointment, directorName, onClose, onEdit }
   const status = statusLabels[appointment.status];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="p-6 border-b border-slate-200 flex justify-between items-start">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">{appointment.title}</h2>
-            <p className="text-sm text-slate-500 mt-1">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-start sticky top-0 bg-white z-10">
+          <div className="min-w-0 pr-4">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800 break-words">{appointment.title}</h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               {formatDisplayDate(toDateStr(appointment.date))} · {appointment.startTime} – {appointment.endTime}
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center">&times;</button>
         </div>
 
-        <div className="p-6 space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 sm:p-6 space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Lieu</div><div className="text-sm font-medium text-slate-800 mt-0.5">{appointment.location || '—'}</div></div>
             <div><div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Directeur</div><div className="text-sm font-medium text-slate-800 mt-0.5">{directorName || '—'}</div></div>
             <div><div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Type</div><div className="text-sm font-medium text-slate-800 mt-0.5">{typeLabels[appointment.type] || appointment.type}</div></div>
@@ -356,12 +356,12 @@ export function AppointmentDetail({ appointment, directorName, onClose, onEdit }
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Participants ({appointment.participants?.length || 0})</div>
             <div className="space-y-2">
               {appointment.participants?.map((p, i) => (
-                <div key={i} className="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg text-sm">
-                  <div>
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 bg-slate-50 px-3 py-2 rounded-lg text-sm">
+                  <div className="min-w-0">
                     <span className="font-medium text-slate-700">{p.name}</span>
-                    {p.email && <div className="text-xs text-slate-500">{p.email}</div>}
+                    {p.email && <div className="text-xs text-slate-500 truncate">{p.email}</div>}
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${p.isExternal ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                  <span className={`self-start sm:self-auto text-[10px] px-2 py-0.5 rounded-full font-bold ${p.isExternal ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
                     {p.isExternal ? 'Externe' : 'Interne'}
                   </span>
                 </div>
@@ -376,11 +376,11 @@ export function AppointmentDetail({ appointment, directorName, onClose, onEdit }
           </div>
         </div>
 
-        <div className="p-4 border-t border-slate-200 flex justify-between items-center bg-slate-50 rounded-b-2xl">
-          <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">🖨️ Imprimer (A4)</button>
-          <div className="flex gap-2">
-            <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium">Fermer</button>
-            <button onClick={onEdit} className="px-5 py-2 bg-blue-900 text-white rounded-lg text-sm font-semibold hover:bg-blue-800">Modifier</button>
+        <div className="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-50 rounded-b-2xl">
+          <button onClick={handlePrint} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition min-h-[44px]">🖨️ Imprimer (A4)</button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <button onClick={onClose} className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm text-slate-600 hover:text-slate-800 font-medium min-h-[44px]">Fermer</button>
+            <button onClick={onEdit} className="w-full sm:w-auto px-5 py-2.5 sm:py-2 bg-blue-900 text-white rounded-lg text-sm font-semibold hover:bg-blue-800 min-h-[44px]">Modifier</button>
           </div>
         </div>
       </div>

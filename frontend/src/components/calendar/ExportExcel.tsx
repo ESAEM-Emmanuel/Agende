@@ -9,6 +9,7 @@ interface Props {
   appointments: Appointment[];
   directors: { id: string; firstName: string; lastName: string }[];
   currentDirectorId?: string;
+  className?: string;
 }
 
 const typeLabels: Record<string, string> = {
@@ -24,7 +25,7 @@ const priorityLabels: Record<string, string> = {
   HIGH: 'Haute', NORMAL: 'Normale', LOW: 'Basse',
 };
 
-export function ExportExcel({ appointments, directors, currentDirectorId }: Props) {
+export function ExportExcel({ appointments, directors, currentDirectorId, className = '' }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -102,21 +103,21 @@ export function ExportExcel({ appointments, directors, currentDirectorId }: Prop
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+        className={`bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition min-h-[40px] ${className}`}
       >
         📥 Excel
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setIsOpen(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-slate-800">Exporter en Excel</h2>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4" onClick={() => setIsOpen(false)}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="text-base sm:text-lg font-bold text-slate-800">Exporter en Excel</h2>
+              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl w-10 h-10 flex items-center justify-center">&times;</button>
             </div>
 
-            <div className="p-6 space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 sm:p-6 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date début</label>
                   <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none text-slate-800" />
@@ -200,14 +201,14 @@ export function ExportExcel({ appointments, directors, currentDirectorId }: Prop
               </div>
             </div>
 
-            <div className="p-4 border-t border-slate-200 flex justify-between items-center bg-slate-50 rounded-b-2xl">
-              <button onClick={resetFilters} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 font-medium">Réinitialiser</button>
-              <div className="flex gap-3">
-                <button onClick={() => setIsOpen(false)} className="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white font-medium text-sm">Annuler</button>
+            <div className="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-50 rounded-b-2xl">
+              <button onClick={resetFilters} className="w-full sm:w-auto px-4 py-2 text-sm text-slate-500 hover:text-slate-700 font-medium text-left sm:text-center">Réinitialiser</button>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <button onClick={() => setIsOpen(false)} className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white font-medium text-sm min-h-[44px]">Annuler</button>
                 <button 
                   onClick={handleExport} 
                   disabled={filtered.length === 0}
-                  className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
                 >
                   Télécharger .xlsx ({filtered.length})
                 </button>

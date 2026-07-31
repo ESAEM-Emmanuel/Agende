@@ -25,69 +25,126 @@ const statusOpacity: Record<string, string> = {
 };
 
 const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const dayNamesFull = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
-export function CalendarWeek({ date, appointments, onEdit }: Props) {
+function getWeekDays(date: Date) {
   const startOfWeek = new Date(date);
   const day = startOfWeek.getDay();
   const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
   startOfWeek.setDate(diff);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    return d;
+  });
+}
+
+export function CalendarWeek({ date, appointments, onEdit }: Props) {
+  const weekDays = getWeekDays(date);
   const hours = Array.from({ length: 11 }, (_, i) => i + 8);
+  const todayStr = toDateStr(new Date());
 
   return (
-    <div className="border border-slate-200 rounded-xl overflow-hidden">
-      <div className="grid grid-cols-[60px_repeat(7,1fr)] bg-slate-50 border-b border-slate-200">
-        <div className="p-3 text-xs font-bold text-slate-400 text-center">Heure</div>
-        {Array.from({ length: 7 }).map((_, i) => {
-          const d = new Date(startOfWeek);
-          d.setDate(startOfWeek.getDate() + i);
-          const isToday = toDateStr(d) === toDateStr(new Date());
+    <>
+      {/* Mobile : liste groupée par jour */}
+      <div className="md:hidden space-y-4">
+        {weekDays.map((d, i) => {
+          const dateStr = toDateStr(d);
+          const isToday = dateStr === todayStr;
+          const dayAppts = appointments
+            .filter(a => toDateStr(a.date) === dateStr && a.status !== 'CANCELLED')
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
           return (
-            <div key={`header-${i}`} className={`p-3 text-center text-sm font-semibold ${isToday ? 'bg-blue-900 text-white' : 'text-slate-700'}`}>
-              <div className="text-xs opacity-80">{dayNames[i]}</div>
-              <div>{d.getDate()}</div>
+            <div key={dateStr}>
+              <div className={`flex items-center gap-2 mb-2 px-2 py-1.5 rounded-lg ${isToday ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-700'}`}>
+                <span className="text-xs font-bold uppercase">{dayNamesFull[i]}</span>
+                <span className="text-sm font-semibold">{d.getDate()}/{d.getMonth() + 1}</span>
+                {dayAppts.length > 0 && (
+                  <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${isToday ? 'bg-white/20' : 'bg-white text-slate-600'}`}>
+                    {dayAppts.length}
+                  </span>
+                )}
+              </div>
+              {dayAppts.length === 0 ? (
+                <p className="text-xs text-slate-400 px-2 py-1">Aucun RDV</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {dayAppts.map(appt => {
+                    const colors = typeColors[appt.type] || typeColors.AUTRE;
+                    const opacity = statusOpacity[appt.status] || '';
+                    return (
+                      <button
+                        key={appt.id}
+                        onClick={() => onEdit(appt)}
+                        className={`w-full text-left ${colors.bg} border-l-4 ${colors.border} rounded-lg px-3 py-2 active:scale-[0.99] transition-transform ${opacity}`}
+                      >
+                        <span className={`text-xs font-bold ${colors.text}`}>{appt.startTime} – {appt.endTime}</span>
+                        <span className="text-sm font-semibold text-slate-800 ml-2">{appt.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
-      <div className="grid grid-cols-[60px_repeat(7,1fr)]">
-        {hours.map(h => (
-          <Fragment key={`row-${h}`}>
-            <div className="h-16 border-b border-slate-100 text-right pr-3 pt-2 text-xs text-slate-400 font-medium">{h}h</div>
-            {Array.from({ length: 7 }).map((_, i) => {
-              const d = new Date(startOfWeek);
-              d.setDate(startOfWeek.getDate() + i);
-              const dateStr = toDateStr(d);
-              const cellAppts = appointments.filter(a => {
-                if (toDateStr(a.date) !== dateStr || a.status === 'CANCELLED') return false;
-                const startH = parseInt(a.startTime.split(':')[0]);
-                const endH = parseInt(a.endTime.split(':')[0]);
-                const endM = parseInt(a.endTime.split(':')[1]);
-                const realEndH = endM > 0 ? endH : endH - 1;
-                return startH <= h && h <= realEndH;
-              });
 
+      {/* Desktop : grille horaire */}
+      <div className="hidden md:block border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
+        <div className="min-w-[700px]">
+          <div className="grid grid-cols-[52px_repeat(7,1fr)] lg:grid-cols-[60px_repeat(7,1fr)] bg-slate-50 border-b border-slate-200">
+            <div className="p-2 lg:p-3 text-xs font-bold text-slate-400 text-center">Heure</div>
+            {weekDays.map((d, i) => {
+              const isToday = toDateStr(d) === todayStr;
               return (
-                <div key={`cell-${h}-${i}`} className="h-16 border-b border-l border-slate-100 p-1 space-y-1">
-                  {cellAppts.map(appt => {
-                    const colors = typeColors[appt.type] || typeColors.AUTRE;
-                    const opacity = statusOpacity[appt.status] || '';
-                    return (
-                      <div
-                        key={appt.id}
-                        onClick={() => onEdit(appt)}
-                        className={`${colors.bg} border-l-2 ${colors.border} rounded px-2 py-1 text-[10px] font-bold ${colors.text} cursor-pointer truncate hover:opacity-80 ${opacity}`}
-                        title={`${appt.title} (${appt.startTime}-${appt.endTime})`}
-                      >
-                        {appt.startTime} {appt.title}
-                      </div>
-                    );
-                  })}
+                <div key={`header-${i}`} className={`p-2 lg:p-3 text-center text-sm font-semibold ${isToday ? 'bg-blue-900 text-white' : 'text-slate-700'}`}>
+                  <div className="text-xs opacity-80">{dayNames[i]}</div>
+                  <div>{d.getDate()}</div>
                 </div>
               );
             })}
-          </Fragment>
-        ))}
+          </div>
+          <div className="grid grid-cols-[52px_repeat(7,1fr)] lg:grid-cols-[60px_repeat(7,1fr)]">
+            {hours.map(h => (
+              <Fragment key={`row-${h}`}>
+                <div className="h-14 lg:h-16 border-b border-slate-100 text-right pr-2 lg:pr-3 pt-2 text-xs text-slate-400 font-medium">{h}h</div>
+                {weekDays.map((d, i) => {
+                  const dateStr = toDateStr(d);
+                  const cellAppts = appointments.filter(a => {
+                    if (toDateStr(a.date) !== dateStr || a.status === 'CANCELLED') return false;
+                    const startH = parseInt(a.startTime.split(':')[0]);
+                    const endH = parseInt(a.endTime.split(':')[0]);
+                    const endM = parseInt(a.endTime.split(':')[1]);
+                    const realEndH = endM > 0 ? endH : endH - 1;
+                    return startH <= h && h <= realEndH;
+                  });
+
+                  return (
+                    <div key={`cell-${h}-${i}`} className="h-14 lg:h-16 border-b border-l border-slate-100 p-0.5 lg:p-1 space-y-0.5 lg:space-y-1">
+                      {cellAppts.map(appt => {
+                        const colors = typeColors[appt.type] || typeColors.AUTRE;
+                        const opacity = statusOpacity[appt.status] || '';
+                        return (
+                          <div
+                            key={appt.id}
+                            onClick={() => onEdit(appt)}
+                            className={`${colors.bg} border-l-2 ${colors.border} rounded px-1 lg:px-2 py-0.5 text-[9px] lg:text-[10px] font-bold ${colors.text} cursor-pointer truncate hover:opacity-80 ${opacity}`}
+                            title={`${appt.title} (${appt.startTime}-${appt.endTime})`}
+                          >
+                            {appt.startTime} {appt.title}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </Fragment>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

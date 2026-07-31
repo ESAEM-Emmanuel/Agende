@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [viewingAppointment, setViewingAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const directorId = user?.role === 'DIRECTOR' ? user.id : selectedDirectorId;
 
@@ -38,22 +39,18 @@ export default function DashboardPage() {
     }
   });
 
-  // Charger la liste des directeurs (pour assistants/admins)
   useEffect(() => {
     if (!user) return;
     if (user.role === 'ASSISTANT' || user.role === 'ADMIN') {
       api.get('/users/directors')
         .then(({ data }) => {
           setDirectors(data);
-          if (data.length > 0) {
-            setSelectedDirectorId(prev => prev || data[0].id);
-          }
+          if (data.length > 0) setSelectedDirectorId(prev => prev || data[0].id);
         })
-        .catch(err => console.error('Erreur chargement directeurs:', err));
+        .catch(() => {});
     }
   }, [user]);
 
-  // Charger les rendez-vous
   const loadAppointments = useCallback(async () => {
     if (!directorId) return;
     setLoading(true);
@@ -63,10 +60,8 @@ export default function DashboardPage() {
       const { data } = await api.get(
         `/appointments?directorId=${encodeURIComponent(directorId)}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
       );
-      console.log('RDV chargés:', data?.length, data); // DEBUG
       setAppointments(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.error('Erreur chargement RDV:', err.message);
+    } catch {
       setAppointments([]);
     } finally {
       setLoading(false);
@@ -79,12 +74,7 @@ export default function DashboardPage() {
 
   const handleSave = async (formData: Partial<Appointment>) => {
     if (!directorId) return;
-    const payload = {
-      ...formData,
-      directorId,
-      date: formData.date || toDateStr(new Date()),
-    };
-
+    const payload = { ...formData, directorId, date: formData.date || toDateStr(new Date()) };
     try {
       if (editingAppointment) {
         await api.put(`/appointments/${editingAppointment.id}`, payload);
@@ -95,7 +85,7 @@ export default function DashboardPage() {
       setIsModalOpen(false);
       setEditingAppointment(null);
     } catch (err: any) {
-      alert(err.message || 'Erreur lors de l\'enregistrement');
+      alert(err.message || 'Erreur');
     }
   };
 
@@ -109,7 +99,7 @@ export default function DashboardPage() {
       setIsDetailOpen(false);
       setViewingAppointment(null);
     } catch (err: any) {
-      alert(err.message || 'Erreur suppression');
+      alert(err.message || 'Erreur');
     }
   };
 
@@ -131,58 +121,100 @@ export default function DashboardPage() {
     : user?.role === 'DIRECTOR' ? `${user.firstName} ${user.lastName}` : undefined;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-blue-900 text-white p-4 flex justify-between items-center flex-wrap gap-3">
-        <div>
-          <h1 className="text-xl font-bold">Agenda du Directeur</h1>
-          <p className="text-sm opacity-80">
-            {user?.firstName} {user?.lastName} — {user?.role === 'DIRECTOR' ? 'Directeur' : user?.role === 'ADMIN' ? 'Administrateur' : 'Assistant(e)'}
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {user?.role === 'ADMIN' && (
-            <>
-              <button onClick={() => router.push('/admin/users')} className="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition">⚙️ Utilisateurs</button>
-              <button onClick={() => router.push('/admin/stats')} className="text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition">📊 Stats</button>
-            </>
-          )}
+    <div className="min-h-screen bg-slate-50 pb-4 sm:pb-8">
+      {/* HEADER MOBILE-FIRST */}
+      <header className="bg-blue-900 text-white px-4 py-3 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base sm:text-xl font-bold truncate">Agenda</h1>
+            <p className="text-xs sm:text-sm opacity-80 truncate">
+              {user?.firstName} {user?.lastName}
+            </p>
+          </div>
           
-          {user?.role !== 'DIRECTOR' && (
-            <select
-              value={selectedDirectorId}
-              onChange={(e) => setSelectedDirectorId(e.target.value)}
-              className="bg-white/10 text-white border border-white/30 rounded-lg px-3 py-2 text-sm outline-none focus:bg-white/20"
-            >
-              <option value="" className="text-slate-800">Choisir un directeur...</option>
-              {directors.map(d => (
-                <option key={d.id} value={d.id} className="text-slate-800">
-                  {d.firstName} {d.lastName}
-                </option>
-              ))}
-            </select>
-          )}
-          
-          <ExportExcel appointments={appointments} directors={directors} currentDirectorId={directorId} />
-          
-          <button
-            onClick={() => { setEditingAppointment(null); setIsModalOpen(true); }}
-            disabled={!directorId}
-            className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          {/* Menu hamburger mobile */}
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="sm:hidden p-2 rounded-lg bg-white/10 active:bg-white/20"
+            aria-label="Menu"
           >
-            + Nouveau RDV
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <button onClick={logout} className="text-sm opacity-80 hover:opacity-100 px-3 py-2">
-            Déconnexion
-          </button>
+
+          {/* Actions desktop */}
+          <div className="hidden sm:flex items-center gap-2 flex-wrap justify-end">
+            {user?.role === 'ADMIN' && (
+              <>
+                <button onClick={() => router.push('/admin/users')} className="text-xs lg:text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition">⚙️ Utilisateurs</button>
+                <button onClick={() => router.push('/admin/stats')} className="text-xs lg:text-sm bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition">📊 Stats</button>
+              </>
+            )}
+            {user?.role !== 'DIRECTOR' && (
+              <select
+                value={selectedDirectorId}
+                onChange={(e) => setSelectedDirectorId(e.target.value)}
+                className="bg-white/10 text-white border border-white/30 rounded-lg px-3 py-2 text-xs lg:text-sm outline-none focus:bg-white/20 max-w-[160px]"
+              >
+                <option value="" className="text-slate-800">Choisir...</option>
+                {directors.map(d => (
+                  <option key={d.id} value={d.id} className="text-slate-800">{d.firstName} {d.lastName}</option>
+                ))}
+              </select>
+            )}
+            <ExportExcel appointments={appointments} directors={directors} currentDirectorId={directorId} />
+            <button
+              onClick={() => { setEditingAppointment(null); setIsModalOpen(true); }}
+              disabled={!directorId}
+              className="bg-white text-blue-900 px-3 py-2 rounded-lg font-semibold text-xs lg:text-sm hover:bg-blue-50 disabled:opacity-50 active:scale-95 transition"
+            >
+              + RDV
+            </button>
+            <button onClick={logout} className="text-xs lg:text-sm opacity-80 hover:opacity-100 px-2 py-2">Déconnexion</button>
+          </div>
         </div>
+
+        {/* Menu mobile déroulant */}
+        {menuOpen && (
+          <div className="sm:hidden mt-3 space-y-2 pb-2 border-t border-white/20 pt-3">
+            {user?.role === 'ADMIN' && (
+              <div className="flex gap-2">
+                <button onClick={() => { setMenuOpen(false); router.push('/admin/users'); }} className="flex-1 text-sm bg-white/10 px-3 py-2.5 rounded-lg">⚙️ Utilisateurs</button>
+                <button onClick={() => { setMenuOpen(false); router.push('/admin/stats'); }} className="flex-1 text-sm bg-white/10 px-3 py-2.5 rounded-lg">📊 Stats</button>
+              </div>
+            )}
+            {user?.role !== 'DIRECTOR' && (
+              <select
+                value={selectedDirectorId}
+                onChange={(e) => { setSelectedDirectorId(e.target.value); setMenuOpen(false); }}
+                className="w-full bg-white/10 text-white border border-white/30 rounded-lg px-3 py-2.5 text-sm outline-none"
+              >
+                <option value="" className="text-slate-800">Choisir un directeur...</option>
+                {directors.map(d => (
+                  <option key={d.id} value={d.id} className="text-slate-800">{d.firstName} {d.lastName}</option>
+                ))}
+              </select>
+            )}
+            <div className="flex gap-2">
+              <ExportExcel appointments={appointments} directors={directors} currentDirectorId={directorId} className="flex-1" />
+              <button
+                onClick={() => { setEditingAppointment(null); setIsModalOpen(true); setMenuOpen(false); }}
+                disabled={!directorId}
+                className="flex-1 bg-white text-blue-900 py-2.5 rounded-lg font-semibold text-sm disabled:opacity-50"
+              >
+                + Nouveau RDV
+              </button>
+            </div>
+            <button onClick={() => { logout(); setMenuOpen(false); }} className="w-full text-sm opacity-80 py-2 text-left">Déconnexion</button>
+          </div>
+        )}
       </header>
 
-      <main className="p-6 max-w-7xl mx-auto">
-        {loading && <div className="text-center text-slate-400 py-4">Chargement...</div>}
+      {/* MAIN */}
+      <main className="px-3 py-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {loading && <div className="text-center text-slate-400 py-6 text-sm">Chargement...</div>}
         
         {!directorId && user?.role !== 'DIRECTOR' ? (
-          <div className="bg-white rounded-2xl p-12 text-center text-slate-500">
+          <div className="bg-white rounded-2xl p-8 sm:p-12 text-center text-slate-500 text-sm">
             Veuillez sélectionner un directeur pour afficher son agenda.
           </div>
         ) : (
@@ -195,6 +227,7 @@ export default function DashboardPage() {
         )}
       </main>
 
+      {/* MODALS */}
       {isModalOpen && directorId && (
         <AppointmentModal
           appointment={editingAppointment}

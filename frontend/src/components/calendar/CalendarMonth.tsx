@@ -39,13 +39,18 @@ export function CalendarMonth({ date, appointments, onEdit, onDateChange }: Prop
 
   return (
     <div>
-      <div className="text-center text-xl font-bold text-slate-800 mb-6">{monthNames[month]} {year}</div>
-      <div className="grid grid-cols-7 gap-2">
+      <div className="text-center text-base sm:text-xl font-bold text-slate-800 mb-3 sm:mb-6">
+        {monthNames[month]} {year}
+      </div>
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-1 md:gap-2">
         {dayNames.map(dn => (
-          <div key={dn} className="text-center text-xs font-bold text-slate-400 uppercase py-2">{dn}</div>
+          <div key={dn} className="text-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase py-1 sm:py-2">
+            <span className="hidden sm:inline">{dn}</span>
+            <span className="sm:hidden">{dn.charAt(0)}</span>
+          </div>
         ))}
         {Array.from({ length: startDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="min-h-[100px] bg-slate-50 rounded-lg" />
+          <div key={`empty-${i}`} className="min-h-[52px] sm:min-h-[72px] md:min-h-[100px] bg-slate-50 rounded sm:rounded-lg" />
         ))}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const dayNum = i + 1;
@@ -60,26 +65,39 @@ export function CalendarMonth({ date, appointments, onEdit, onDateChange }: Prop
             <div
               key={dayNum}
               onClick={() => onDateChange(d)}
-              className={`min-h-[100px] rounded-lg border p-2 cursor-pointer transition hover:shadow-md ${isToday ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-200'}`}
+              className={`min-h-[52px] sm:min-h-[72px] md:min-h-[100px] rounded sm:rounded-lg border p-0.5 sm:p-1.5 md:p-2 cursor-pointer transition hover:shadow-md active:scale-[0.98] ${
+                isToday ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-200'
+              }`}
             >
-              <div className={`text-sm font-bold mb-1 ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>{dayNum}</div>
-              <div className="space-y-1">
-                {dayAppts.slice(0, 3).map(appt => {
+              <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
+                {dayNum}
+              </div>
+              <div className="space-y-0.5">
+                {dayAppts.slice(0, 2).map(appt => {
                   const colors = typeColors[appt.type] || typeColors.AUTRE;
                   const opacity = statusOpacity[appt.status] || '';
                   return (
                     <div
                       key={appt.id}
                       onClick={(e) => { e.stopPropagation(); onEdit(appt); }}
-                      className={`${colors.bg} border-l-2 ${colors.border} rounded px-1.5 py-0.5 text-[10px] font-bold ${colors.text} truncate cursor-pointer ${opacity}`}
+                      className={`hidden sm:block ${colors.bg} border-l-2 ${colors.border} rounded px-1 sm:px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold ${colors.text} truncate cursor-pointer ${opacity}`}
                       title={appt.title}
                     >
                       {appt.startTime} {appt.title}
                     </div>
                   );
                 })}
-                {dayAppts.length > 3 && (
-                  <div className="text-[10px] text-slate-400 text-center">+{dayAppts.length - 3}</div>
+                {/* Mobile : pastilles de couleur */}
+                <div className="sm:hidden flex flex-wrap gap-0.5">
+                  {dayAppts.slice(0, 3).map(appt => {
+                    const colors = typeColors[appt.type] || typeColors.AUTRE;
+                    return (
+                      <span key={appt.id} className={`w-1.5 h-1.5 rounded-full ${colors.border.replace('border-', 'bg-')}`} />
+                    );
+                  })}
+                </div>
+                {dayAppts.length > 2 && (
+                  <div className="text-[9px] sm:text-[10px] text-slate-400 text-center">+{dayAppts.length - 2}</div>
                 )}
               </div>
             </div>

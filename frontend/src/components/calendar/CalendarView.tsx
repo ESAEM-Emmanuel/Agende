@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Appointment } from '@/types';
+import { toDateStr, formatDisplayDate } from '@/lib/date';
 import { CalendarDay } from './CalendarDay';
 import { CalendarWeek } from './CalendarWeek';
 import { CalendarMonth } from './CalendarMonth';
@@ -26,15 +27,18 @@ export function CalendarView({ appointments, currentDate, onDateChange, onEdit }
     onDateChange(d);
   };
 
+  const dateLabel = formatDisplayDate(toDateStr(currentDate));
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-3">
-        <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
+    <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      {/* Toolbar — mobile-first : colonne puis ligne */}
+      <div className="p-3 sm:p-4 border-b border-slate-200 space-y-3">
+        <div className="flex gap-1 bg-slate-100 p-1 rounded-lg w-full sm:w-auto">
           {(['day', 'week', 'month'] as View[]).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-1.5 rounded-md text-xs sm:text-sm font-medium transition min-h-[40px] sm:min-h-0 ${
                 view === v ? 'bg-white text-blue-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -42,14 +46,36 @@ export function CalendarView({ appointments, currentDate, onDateChange, onEdit }
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => changeDate(-1)} className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600">‹</button>
-          <button onClick={() => onDateChange(new Date())} className="px-3 py-1.5 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700">Aujourd'hui</button>
-          <button onClick={() => changeDate(1)} className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600">›</button>
+
+        <div className="flex items-center justify-between gap-2">
+          <button
+            onClick={() => changeDate(-1)}
+            className="w-10 h-10 sm:w-8 sm:h-8 flex-shrink-0 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 text-slate-600 text-lg"
+            aria-label="Période précédente"
+          >
+            ‹
+          </button>
+          <div className="flex-1 text-center min-w-0">
+            <p className="text-sm sm:text-base font-semibold text-slate-800 truncate">{dateLabel}</p>
+          </div>
+          <button
+            onClick={() => changeDate(1)}
+            className="w-10 h-10 sm:w-8 sm:h-8 flex-shrink-0 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 text-slate-600 text-lg"
+            aria-label="Période suivante"
+          >
+            ›
+          </button>
         </div>
+
+        <button
+          onClick={() => onDateChange(new Date())}
+          className="w-full sm:w-auto sm:mx-auto sm:block px-3 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 font-medium text-slate-700 min-h-[40px]"
+        >
+          Aujourd&apos;hui
+        </button>
       </div>
 
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {view === 'day' && <CalendarDay date={currentDate} appointments={appointments} onEdit={onEdit} />}
         {view === 'week' && <CalendarWeek date={currentDate} appointments={appointments} onEdit={onEdit} />}
         {view === 'month' && <CalendarMonth date={currentDate} appointments={appointments} onEdit={onEdit} onDateChange={onDateChange} />}

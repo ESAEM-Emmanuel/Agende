@@ -81,41 +81,41 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4" onClick={onClose}>
       <div 
-        className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-800">
+        <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-white z-10">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800 pr-4">
             {appointment ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl flex-shrink-0 w-10 h-10 flex items-center justify-center">&times;</button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Titre *</label>
             <input
               value={form.title}
               onChange={e => setForm({ ...form, title: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base sm:text-sm"
               required
             />
           </div>
           
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date *</label>
-              <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" required />
+              <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none text-base sm:text-sm" required />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Début *</label>
-              <input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" required />
+              <input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none text-base sm:text-sm" required />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Fin *</label>
-              <input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" required />
+              <input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none text-base sm:text-sm" required />
             </div>
           </div>
 
@@ -124,10 +124,10 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
             <input value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" placeholder="Salle de réunion A" />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Type</label>
-              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as AppointmentType })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none bg-white">
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as AppointmentType })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none bg-white text-base sm:text-sm">
                 <option value="REUNION">Réunion</option>
                 <option value="DEJEUNER">Déjeuner</option>
                 <option value="VISITE">Visite</option>
@@ -138,7 +138,7 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Statut</label>
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as AppointmentStatus })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none bg-white">
+              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as AppointmentStatus })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none bg-white text-base sm:text-sm">
                 <option value="CONFIRMED">Confirmé</option>
                 <option value="PENDING">En attente</option>
                 <option value="CANCELLED">Annulé</option>
@@ -147,7 +147,7 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Priorité</label>
-              <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value as Priority })} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none bg-white">
+              <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value as Priority })} className="w-full px-3 py-2.5 sm:py-2 border border-slate-300 rounded-lg outline-none bg-white text-base sm:text-sm">
                 <option value="NORMAL">Normal</option>
                 <option value="HIGH">Haute</option>
                 <option value="LOW">Basse</option>
@@ -162,41 +162,43 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
             {/* Liste existante */}
             <div className="space-y-2">
               {(form.participants || []).map((p, i) => (
-                <div key={i} className="flex items-center gap-2 bg-slate-50 p-2 rounded-lg">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-2 bg-slate-50 p-2 rounded-lg">
                   <input
                     value={p.name}
                     onChange={e => updateParticipant(i, 'name', e.target.value)}
-                    className="flex-1 px-2 py-1 text-sm border border-slate-200 rounded outline-none"
+                    className="flex-1 px-2 py-2 sm:py-1 text-sm border border-slate-200 rounded outline-none"
                     placeholder="Nom"
                   />
                   <input
                     value={p.email || ''}
                     onChange={e => updateParticipant(i, 'email', e.target.value)}
-                    className="w-32 px-2 py-1 text-sm border border-slate-200 rounded outline-none"
+                    className="w-full sm:w-32 px-2 py-2 sm:py-1 text-sm border border-slate-200 rounded outline-none"
                     placeholder="Email"
                   />
-                  <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={p.isExternal}
-                      onChange={e => updateParticipant(i, 'isExternal', e.target.checked)}
-                      className="rounded"
-                    />
-                    Ext.
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => removeParticipant(i)}
-                    className="text-red-500 hover:text-red-700 text-sm font-bold px-2"
-                  >
-                    ×
-                  </button>
+                  <div className="flex items-center justify-between sm:justify-start gap-2">
+                    <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={p.isExternal}
+                        onChange={e => updateParticipant(i, 'isExternal', e.target.checked)}
+                        className="rounded"
+                      />
+                      Externe
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => removeParticipant(i)}
+                      className="text-red-500 hover:text-red-700 text-sm font-bold px-2 py-1"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* Ajout nouveau participant */}
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 border-t border-slate-100">
               <input
                 value={newParticipant.name}
                 onChange={e => setNewParticipant({ ...newParticipant, name: e.target.value })}
@@ -207,26 +209,28 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
               <input
                 value={newParticipant.email}
                 onChange={e => setNewParticipant({ ...newParticipant, email: e.target.value })}
-                className="w-32 px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none"
+                className="w-full sm:w-32 px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none"
                 placeholder="Email"
               />
-              <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap px-2">
-                <input
-                  type="checkbox"
-                  checked={newParticipant.isExternal}
-                  onChange={e => setNewParticipant({ ...newParticipant, isExternal: e.target.checked })}
-                  className="rounded"
-                />
-                Externe
-              </label>
-              <button
-                type="button"
-                onClick={addParticipant}
-                disabled={!newParticipant.name.trim()}
-                className="bg-blue-900 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-50"
-              >
-                +
-              </button>
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap px-1">
+                  <input
+                    type="checkbox"
+                    checked={newParticipant.isExternal}
+                    onChange={e => setNewParticipant({ ...newParticipant, isExternal: e.target.checked })}
+                    className="rounded"
+                  />
+                  Externe
+                </label>
+                <button
+                  type="button"
+                  onClick={addParticipant}
+                  disabled={!newParticipant.name.trim()}
+                  className="flex-1 sm:flex-none bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 disabled:opacity-50 min-h-[40px]"
+                >
+                  Ajouter
+                </button>
+              </div>
             </div>
           </div>
 
@@ -235,19 +239,19 @@ export function AppointmentModal({ appointment, onClose, onSave, onDelete }: Pro
             <textarea value={form.notes || ''} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none resize-none" placeholder="Ordre du jour, documents à préparer..." />
           </div>
 
-          <div className="flex justify-between items-center pt-2">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 pt-2 pb-safe">
             {onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
-                className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-medium text-sm"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-medium text-sm"
               >
                 Supprimer
               </button>
             )}
-            <div className="flex gap-3 ml-auto">
-              <button type="button" onClick={onClose} className="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium">Annuler</button>
-              <button type="submit" className="px-6 py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800">Enregistrer</button>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:ml-auto w-full sm:w-auto">
+              <button type="button" onClick={onClose} className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium min-h-[44px]">Annuler</button>
+              <button type="submit" className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 min-h-[44px]">Enregistrer</button>
             </div>
           </div>
         </form>
