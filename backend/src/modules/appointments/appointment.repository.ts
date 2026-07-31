@@ -35,6 +35,28 @@ export class AppointmentRepository {
     });
   }
 
+//   async update(id: string, data: UpdateAppointmentInput) {
+//     // On isole les participants et on nettoie les champs interdits
+//     const { participants, date, id: _id, createdAt, updatedAt, createdById, directorId, ...rest } = data as any;
+
+//     const updateData: any = { ...rest };
+    
+//     // Conversion de la date string YYYY-MM-DD en DateTime
+//     if (date) {
+//       updateData.date = new Date(date + 'T00:00:00.000Z');
+//     }
+
+//     // Gestion des participants : on supprime les anciens et on recrée
+//     if (participants) {
+//       updateData.participants = { deleteMany: {}, createMany: { data: participants } };
+//     }
+
+//     return prisma.appointment.update({
+//       where: { id },
+//       data: updateData,
+//       include: { participants: true },
+//     });
+//   }
   async update(id: string, data: UpdateAppointmentInput) {
     // On isole les participants et on nettoie les champs interdits
     const { participants, date, id: _id, createdAt, updatedAt, createdById, directorId, ...rest } = data as any;
@@ -43,20 +65,28 @@ export class AppointmentRepository {
     
     // Conversion de la date string YYYY-MM-DD en DateTime
     if (date) {
-      updateData.date = new Date(date + 'T00:00:00.000Z');
+        updateData.date = new Date(date + 'T00:00:00.000Z');
     }
 
     // Gestion des participants : on supprime les anciens et on recrée
     if (participants) {
-      updateData.participants = { deleteMany: {}, createMany: { data: participants } };
+        // ❌ Prisma n'attend PAS appointmentId dans un createMany imbriqué
+        // ❌ On retire aussi l'id pour laisser Prisma générer de nouveaux UUID 
+        //    (ou gardez-le si vous préférez préserver les mêmes IDs)
+        const cleanedParticipants = participants.map((p: any) => {
+        const { appointmentId, id: _pid, ...participantData } = p;
+        return participantData;
+        });
+
+        updateData.participants = { deleteMany: {}, createMany: { data: cleanedParticipants } };
     }
 
     return prisma.appointment.update({
-      where: { id },
-      data: updateData,
-      include: { participants: true },
+        where: { id },
+        data: updateData,
+        include: { participants: true },
     });
-  }
+    }
 
   async delete(id: string) {
     return prisma.appointment.delete({ where: { id } });
