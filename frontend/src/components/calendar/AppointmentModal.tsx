@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Appointment, AppointmentType, AppointmentStatus, Priority, Participant } from '@/types';
+import { Appointment, Participant } from '@/types';
+
+type AppointmentType = Appointment['type'];
+type AppointmentStatus = Appointment['status'];
+type Priority = Appointment['priority'];
 
 interface Props {
   appointment: Appointment | null;
